@@ -5,8 +5,16 @@ const Page404 = () => {
 	return (
 		<div>
 			<ErrorMessage/>
-			<p>Page doesn't exist</p>
-			<Link to="/">Back to main page</Link>
+			<p style={ {textAlign: 'center', fontWeight: 'bold', fontSize: '24px'} }>Page doesn't
+				exist</p>
+			<Link to="/" style={ {
+				display: 'block',
+				textAlign: 'center',
+				fontWeight: 'bold',
+				fontSize: '24px',
+				marginTop: '10px'
+			} }>Back to
+				main page</Link>
 		</div>
 	);
 };
