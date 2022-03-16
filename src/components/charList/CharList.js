@@ -1,14 +1,35 @@
 import { useState, useEffect } from "react";
 import useMarvelService from "../../services/MarvelService";
-import ErrorMessage from "../errorMessage/ErrorMessage";
-import Spinner from "../spinner/Spinner";
 import PropTypes from "prop-types";
 
 import './charList.scss';
+import Spinner from "../spinner/Spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
+
+const setContent = (process, Component, newCharLoading) => {
+	switch (process) {
+		case 'waiting': {
+			return <Spinner/>;
+		}
+		case 'loading': {
+			return newCharLoading ? <Component/> : <Spinner/>;
+		}
+		case 'confirmed': {
+			return <Component/>;
+		}
+		case 'error': {
+			return <ErrorMessage/>;
+		}
+		default: {
+			throw new Error('Unexpected process state');
+		}
+	}
+}
+
 
 const CharList = (props) => {
 
-	const {loading, error, getAllCharacters} = useMarvelService();
+	const {getAllCharacters, process, setProcess} = useMarvelService();
 
 	const [characters, setCharacters] = useState([]);
 	const [newCharLoading, setNewCharLoading] = useState(false);
@@ -23,6 +44,7 @@ const CharList = (props) => {
 		initial ? setNewCharLoading(false) : setNewCharLoading(true);
 		getAllCharacters(offset)
 			.then(onCharListLoaded)
+			.then(() => setProcess('confirmed'))
 	}
 
 	const onCharListLoaded = (newCharacters) => {
@@ -65,20 +87,14 @@ const CharList = (props) => {
 		);
 	};
 
-	const elements = renderItems(characters);
-
-	const errorMessage = error ? <ErrorMessage/> : null;
-	const loadingSpinner = loading && !newCharLoading ? <Spinner/> : null;
-
 	return (
 		<div className="char__list">
-			{ errorMessage }
-			{ loadingSpinner }
-			{ elements }
-			<button className="button button__main button__long"
-					disabled={ newCharLoading }
-					style={ {'display': charEnded ? 'none' : 'block'} }
-					onClick={ () => onRequest(offset) }>
+			{ setContent(process, () => renderItems(characters), newCharLoading) }
+			<button
+				className="button button__main button__long"
+				disabled={ newCharLoading }
+				style={ {'display': charEnded ? 'none' : 'block'} }
+				onClick={ () => onRequest(offset) }>
 				<div className="inner">load more</div>
 			</button>
 		</div>
