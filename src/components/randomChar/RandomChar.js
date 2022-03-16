@@ -2,22 +2,21 @@ import { useState, useEffect } from "react";
 
 import mjolnir from '../../resources/img/mjolnir.png';
 import useMarvelService from "../../services/MarvelService";
-import Spinner from "../spinner/Spinner";
-import ErrorMessage from "../errorMessage/ErrorMessage";
+import setContent from "../../utils/setContent";
 
 import './randomChar.scss';
 
 const RandomChar = () => {
 
 	const [character, setCharacter] = useState({});
-	const {loading, error, getCharacter, clearError} = useMarvelService();
+	const {getCharacter, clearError, process, setProcess} = useMarvelService();
 
 	useEffect(() => {
 		updateCharacter();
-		// const timerId = setInterval(updateCharacter, 5000);
+		const timerId = setInterval(updateCharacter, 5000);
 
 		return () => {
-			// clearInterval(timerId);
+			clearInterval(timerId);
 		}
 	}, []);
 
@@ -30,17 +29,12 @@ const RandomChar = () => {
 		const id = Math.floor(Math.random() * (1_011_400 - 1_011_000) + 1_011_000);
 		getCharacter(id)
 			.then(onCharacterLoaded)
+			.then(() => setProcess('confirmed'))
 	};
-
-	const errorMessage = error ? <ErrorMessage/> : null;
-	const loadingSpinner = loading ? <Spinner/> : null;
-	const content = !(loading || error) ? <View character={ character }/> : null;
 
 	return (
 		<div className="randomchar">
-			{ errorMessage }
-			{ loadingSpinner }
-			{ content }
+			{ setContent(process, View, character) }
 			<div className="randomchar__static">
 				<p className="randomchar__title">
 					Random character for today!<br/>
@@ -59,9 +53,9 @@ const RandomChar = () => {
 	)
 };
 
-const View = ({character}) => {
+const View = ({data}) => {
 
-	const {name, description, thumbnail, homePage, wikiPage} = character;
+	const {name, description, thumbnail, homePage, wikiPage} = data;
 
 	let imgStyle = {'objectFit': 'cover'};
 	if (thumbnail?.indexOf('not_available')) {
