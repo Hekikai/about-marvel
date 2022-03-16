@@ -7,7 +7,7 @@ const Page404 = () => {
 			<ErrorMessage/>
 			<p style={ {textAlign: 'center', fontWeight: 'bold', fontSize: '24px'} }>Page doesn't
 				exist</p>
-			<Link to="/" style={ {
+			<Link to="/about-marvel" style={ {
 				display: 'block',
 				textAlign: 'center',
 				fontWeight: 'bold',
